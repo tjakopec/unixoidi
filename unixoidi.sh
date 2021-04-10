@@ -90,33 +90,11 @@ chown -R $KORISNIK $WWW_DIR
 # postavi grupu na www
 chgrp -R $KORISNIK $WWW_DIR
 
-# onemogući default apache konfiguraciju
-a2dissite 000-default.conf
 # omogući URL rewrite
 a2enmod rewrite
 # potvrdi onemogućavanje default konfiguracije
 service apache2 restart
 
-# zapiši apache virtual host konfiguraciju za korisnika
-cat <<EOT >> /etc/apache2/sites-available/$DOMENA.conf
-<VirtualHost *:80>
-    ServerName $DOMENA
-    ServerAlias $DOMENA
-    DocumentRoot "$WWW_DIR"
-    ErrorLog "/home/$KORISNIK/$DOMENA-error_log"
-    CustomLog "/home/$KORISNIK/$DOMENA-access_log" common
-    ServerAdmin $EMAIL
-        <Directory "$WWW_DIR">
-	      Options -Indexes +FollowSymLinks +MultiViews
-          AllowOverride All
-          Require all granted
-        </Directory>
-</VirtualHost>
-EOT
-# omogući novi virtual host
-a2ensite $DOMENA.conf
-# ponovo pokreni apache
-service apache2 restart
 
 # potpiši https - kasnije uključi
 #certbot --non-interactive --agree-tos -m tjakopec@$EMAIL \
