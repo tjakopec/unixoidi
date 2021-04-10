@@ -6,9 +6,14 @@ EMAIL=tjakopec@ffos.hr
 
 
 apt update
-# instalacije potrebnih paketa
-apt install -y php php-mysql apache2 mariadb-server \
-certbot python3-certbot-apache
+# instalacija webserver
+apt install -y apache2 
+# instalacija programski jezik
+apt install -y php libapache2-mod-php php-mysql 
+# instaacija baza podataka
+apt install -y mariadb-server
+# instalacija https verifikacije 
+apt install -y certbot python3-certbot-apache
 
 
 SSH_CONFIG_DAT=/etc/ssh/sshd_config
@@ -87,10 +92,12 @@ chgrp -R $KORISNIK $WWW_DIR
 
 # onemogući default apache konfiguraciju
 a2dissite 000-default.conf
+# omogući URL rewrite
+a2enmod rewrite
 # potvrdi onemogućavanje default konfiguracije
 service apache2 restart
 
-# zapiši nginx konfiguraciju za korisnika
+# zapiši apache virtual host konfiguraciju za korisnika
 cat <<EOT >> /etc/apache2/sites-available/$DOMENA.conf
 <VirtualHost *:80>
     ServerName $DOMENA
