@@ -8,12 +8,22 @@ EMAIL=tjakopec@ffos.hr
 apt update
 # instalacija webserver
 apt install -y apache2 
-# instalacija programski jezik
-apt install -y php libapache2-mod-php php-mysql 
-# instaacija baza podataka
+# instalacija baza podataka
 apt install -y mariadb-server
+# instalacija programski jezik PHP
+apt install -y php php-fpm libapache2-mod-php php-mysql 
 # instalacija https verifikacije 
 apt install -y certbot python3-certbot-apache
+
+# POST INSTALCIJA
+# omogući URL rewrite
+a2enmod rewrite
+# FAST CGI
+a2enmod proxy_fcgi setenvif
+# omogući PHP FPM
+a2enconf php7.4-fpm
+# potvrdi onemogućavanje default konfiguracije
+service apache2 restart
 
 
 SSH_CONFIG_DAT=/etc/ssh/sshd_config
@@ -62,7 +72,6 @@ KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
 LOZINKA=$(openssl rand -base64 16) #za sudo
 KLJUC=/home/$KORISNIK/kljuc
 SSH_DIR=/home/$KORISNIK/.ssh
-WWW_DIR=/home/$KORISNIK/www
 # dodaj korisnika
 adduser --disabled-password --gecos "" $KORISNIK
 # postavi korisniku lozinku (treba mu za sudo)
@@ -82,23 +91,11 @@ ssh-keygen -b 2048 -t rsa -f $KLJUC -q -N ""
 # postavi javni ključ u datoteku javnih ključeva
 cat $KLJUC.pub >> $SSH_DIR/authorized_keys
 
-# kreiraj direktorij za web sadržaj
-mkdir $WWW_DIR
-echo "Hello $KORISNIK" > $WWW_DIR/index.html
-# postavi korisnika na www
-chown -R $KORISNIK $WWW_DIR
-# postavi grupu na www
-chgrp -R $KORISNIK $WWW_DIR
-
-# omogući URL rewrite
-a2enmod rewrite
-# potvrdi onemogućavanje default konfiguracije
-service apache2 restart
 
 
 # potpiši https - kasnije uključi
 #certbot --non-interactive --agree-tos -m tjakopec@$EMAIL \
-#--nginx --redirect -d $DOMENA -d www.$DOMENA
+#--apache --redirect -d $DOMENA -d www.$DOMENA
 #There were too many requests of a given type :: Error creating new order :: too many certificates already issued for exact set of domains: unixoidi.xyz,www.unixoidi.xyz: see https://letsencrypt.org/docs/rate-limits/
 
 # ispiši podatke u konzolu za copy/paste
