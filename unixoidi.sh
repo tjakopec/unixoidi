@@ -2,22 +2,14 @@
 
 # naziv domene
 DOMENA=unixoidi.xyz
+EMAIL=tjakopec@ffos.hr
 
-# potrebno za PHP 8.0
-#apt install -y software-properties-common
-#add-apt-repository -y ppa:ondrej/php
+
 apt update
 # instalacije potrebnih paketa
-#apt install -y php8.0 php8.0-fpm php8.0-mysql nginx mariadb-server \
-#certbot python3-certbot-nginx
+apt install -y php php-mysql apache2 mariadb-server \
+certbot python3-certbot-apache
 
-apt install -y php php-fpm php-mysql nginx mariadb-server \
-certbot python3-certbot-nginx
-
-
-# pokreni nginx po reboot-u stroja
-systemctl start nginx
-systemctl enable nginx
 
 SSH_CONFIG_DAT=/etc/ssh/sshd_config
 MIN_PORT=1025
@@ -93,49 +85,34 @@ chown -R $KORISNIK $WWW_DIR
 # postavi grupu na www
 chgrp -R $KORISNIK $WWW_DIR
 
-# onemogući default nginx konfiguraciju
-rm /etc/nginx/sites-enabled/default
+# onemogući default apache konfiguraciju
+a2dissite 000-default.conf
 # potvrdi onemogućavanje default konfiguracije
-systemctl restart nginx
+service apache2 restart
 
 # zapiši nginx konfiguraciju za korisnika
-cat <<EOT >> /etc/nginx/sites-available/$DOMENA
-server {
-        listen 80;
-        listen [::]:80;
-        root $WWW_DIR;
-        index index.php index.html index.htm index.nginx-debian.html;
-        server_name $DOMENA www.$DOMENA;
-        location / {
-                try_files \$uri /index.php\\\$is_args\$args;
-        }
-        location ~ \\.php\$ {
-                include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-        }
-                location ~ /\\.ht {
-                deny all;
-        }
-        location ~ ^/\\.php(/\$) {
-                fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-                fastcgi_split_path_info ^(.+\\.php)(/.*)\$;
-                include fastcgi_params;
-                fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
-                fastcgi_param DOCUMENT_ROOT \$realpath_root;
-                internal;
-        }
-        location ~ \\.php\$ {
-                return 404;
-        }
-}
+cat <<EOT >> /etc/apache2/sites-available/$DOMENA.conf
+<VirtualHost *:80>
+    ServerName $DOMENA
+    ServerAlias $DOMENA
+    DocumentRoot "$WWW_DIR"
+    ErrorLog "/home/$KORISNIK/$DOMENA-error_log"
+    CustomLog "/home/$KORISNIK/$DOMENA-access_log" common
+    ServerAdmin $EMAIL
+        <Directory "$WWW_DIR">
+	      Options -Indexes +FollowSymLinks +MultiViews
+          AllowOverride All
+          Require all granted
+        </Directory>
+</VirtualHost>
 EOT
-# postavi simbolički link u omogućene domene
-ln -s /etc/nginx/sites-available/$DOMENA /etc/nginx/sites-enabled/
-# ponovo pokreni nginx
-systemctl restart nginx
+# omogući novi virtual host
+a2ensite $DOMENA.conf
+# ponovo pokreni apache
+service apache2 restart
 
 # potpiši https - kasnije uključi
-#certbot --non-interactive --agree-tos -m tjakopec@ffos.hr \
+#certbot --non-interactive --agree-tos -m tjakopec@$EMAIL \
 #--nginx --redirect -d $DOMENA -d www.$DOMENA
 #There were too many requests of a given type :: Error creating new order :: too many certificates already issued for exact set of domains: unixoidi.xyz,www.unixoidi.xyz: see https://letsencrypt.org/docs/rate-limits/
 
