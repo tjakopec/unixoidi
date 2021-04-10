@@ -4,15 +4,16 @@
 DOMENA=unixoidi.xyz
 
 # potrebno za PHP 8.0
-apt install -y software-properties-common
-add-apt-repository -y ppa:ondrej/php
+#apt install -y software-properties-common
+#add-apt-repository -y ppa:ondrej/php
 apt update
 # instalacije potrebnih paketa
-apt install -y php8.0 php8.0-fpm php8.0-mysql nginx mariadb-server \
+#apt install -y php8.0 php8.0-fpm php8.0-mysql nginx mariadb-server \
+#certbot python3-certbot-nginx
+
+apt install -y php php-fpm php-mysql nginx mariadb-server \
 certbot python3-certbot-nginx
 
-# ponovno pokreni PHP FPM - potrebno
-systemctl restart php8.0-fpm.service 
 
 # pokreni nginx po reboot-u stroja
 systemctl start nginx
@@ -110,13 +111,13 @@ server {
         }
         location ~ \\.php\$ {
                 include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php8.0-fpm.sock;
+                fastcgi_pass unix:/run/php/php7.4-fpm.sock;
         }
                 location ~ /\\.ht {
                 deny all;
         }
         location ~ ^/\\.php(/\$) {
-                fastcgi_pass unix:/run/php/php8.0-fpm.sock;
+                fastcgi_pass unix:/run/php/php7.4-fpm.sock;
                 fastcgi_split_path_info ^(.+\\.php)(/.*)\$;
                 include fastcgi_params;
                 fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
@@ -133,10 +134,10 @@ ln -s /etc/nginx/sites-available/$DOMENA /etc/nginx/sites-enabled/
 # ponovo pokreni nginx
 systemctl restart nginx
 
-# potpiši https
-certbot --non-interactive --agree-tos -m tjakopec@ffos.hr \
---nginx --redirect -d $DOMENA -d www.$DOMENA
-
+# potpiši https - kasnije uključi
+#certbot --non-interactive --agree-tos -m tjakopec@ffos.hr \
+#--nginx --redirect -d $DOMENA -d www.$DOMENA
+#There were too many requests of a given type :: Error creating new order :: too many certificates already issued for exact set of domains: unixoidi.xyz,www.unixoidi.xyz: see https://letsencrypt.org/docs/rate-limits/
 
 # ispiši podatke u konzolu za copy/paste
 echo "korisnik: $KORISNIK"
