@@ -14,13 +14,17 @@ SSH_DIR=/home/$KORISNIK/.ssh
 
 apt update
 # instalacija webserver
-apt install -y apache2 \
+apt install -y apache2 
 # instalacija baza podataka
- mariadb-server \
+apt install -y mariadb-server 
 # instalacija programski jezik PHP
- php php-fpm libapache2-mod-php php-mysql \
+apt install -y php 
 # instalacija https verifikacije 
- certbot python3-certbot-apache
+apt install -y certbot python3-certbot-apache
+# FAST PHP MANAGER
+apt install -y php-fpm
+# Mysql/MariaDB PHP driver
+apt install -y php-mysql
 
 # POST INSTALCIJA
 # omogući URL rewrite
@@ -57,11 +61,7 @@ cd wordpress
 mv * /var/www/html
 # počisti za sobom
 cd ..; rmdir wordpress; rm latest.tar.gz
-# postavi www-data kogirsnika i grupu da se može
-# putem web sučelja upravljati s wordpressom
-chown -R www-data:www-data /var/www/html
-find /var/www/html -type d -exec chmod 755 {} \;
-find /var/www/html -type f -exec chmod 644 {} \;
+
 
 # generiraj SALT prema wordpres preporuci
 SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
@@ -76,13 +76,19 @@ define( 'DB_HOST', 'localhost' );
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', 'utf8mb4_unicode_ci' );
 $SALT_API
-$table_prefix = 'wp_';
+\$table_prefix = 'wp_';
 define( 'WP_DEBUG', false );
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 require_once ABSPATH . 'wp-settings.php';
 EOT
+
+# postavi www-data kogirsnika i grupu da se može
+# putem web sučelja upravljati s wordpressom
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
 
 curl "http://$DOMENA/wp-admin/install.php?step=2" \
   --data-urlencode "weblog_title=$DOMENA"\
