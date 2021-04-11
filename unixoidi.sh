@@ -198,7 +198,7 @@ certbot --non-interactive --agree-tos -m $EMAIL \
 #                  ISPIS PODATAKA KORISNIKU                        #
 ####################################################################
 # ispiši podatke u konzolu za copy/paste
-echo "korisnik i ozinka isti za sve:"
+echo "korisnik i lozinka isti za sve:"
 echo "1. linux user"
 echo "2. database user"
 echo "3. wordpress user"
