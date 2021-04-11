@@ -56,6 +56,7 @@ chown -R www-data:www-data /var/www/html
 find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
 
+SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 
 # kreiraj wp-config datoteku
 cat <<EOT >> /var/www/html/wp-config.php
@@ -65,14 +66,7 @@ define( 'DB_PASSWORD', '$LOZINKA' );
 define( 'DB_HOST', 'localhost' );
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', 'utf8mb4_unicode_ci' );
-define('AUTH_KEY',         'z1P9ro{_5sL~7S&0+HWo(^U&w1Lw)U~5X4}k6?lx+v[fGgWpal |D=&R1+7Ku|Zf');
-define('SECURE_AUTH_KEY',  'UnB4>ft{7d2+X]Q-k*Z5DkXTjdH:HH>*46+/bfZ8q|81exq5,(_Gn8-`;>Z0NJ-*');
-define('LOGGED_IN_KEY',    'WwsHbT5L+8cg.}^puIT/9%+/uR]hxLLFkci8iaZP/cYle+}7iXPTm*L*o#I.R&||');
-define('NONCE_KEY',        '}6a/gU|qE:XMX{pToe9}NdcGK*~-1--HE)wQL5(Jk?mBE7/YqwC-PsA:dnN=2|-M');
-define('AUTH_SALT',        'TE/)V~cp=G+~h8dq}1c+1g_d/el^1zmR-Zz66wOC8p]72 6z=yFH<)_T+/P?ds@!');
-define('SECURE_AUTH_SALT', 'EoD?ri.B@#LWsRTI@u`o21|YW[1]M32zJ|T8Bi8A#SxALu1N)z}OHDXKm-/_F_:+');
-define('LOGGED_IN_SALT',   'LTDg=:a|bHlJF,/|Mx]Vx|]Cm))HnL8)6_GX,#S2v#R.4d8PXS|yqu91sGtp7,[`');
-define('NONCE_SALT',       'V:O-6KNR,.sGX-&!L|&?hB3y59Q6 PFUBJP!t4,XX}C@ <p}kQ8;9)dX?`KV<}TE');
+$SALT_API
 $table_prefix = 'wp_';
 define( 'WP_DEBUG', false );
 if ( ! defined( 'ABSPATH' ) ) {
