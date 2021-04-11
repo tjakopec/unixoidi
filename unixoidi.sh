@@ -2,7 +2,14 @@
 
 # naziv domene
 DOMENA=unixoidi.xyz
+# email vlasnika
 EMAIL=tjakopec@ffos.hr
+# kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
+KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
+# generiraj lozinku duljine 16 znaova
+LOZINKA=$(openssl rand -base64 16) #za sudo
+KLJUC=/home/$KORISNIK/kljuc
+SSH_DIR=/home/$KORISNIK/.ssh
 
 
 apt update
@@ -56,10 +63,12 @@ chown -R www-data:www-data /var/www/html
 find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
 
+# generiraj SALT prema wordpres preporuci
 SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 
 # kreiraj wp-config datoteku
 cat <<EOT >> /var/www/html/wp-config.php
+<?php
 define( 'DB_NAME', '$KORISNIK' );
 define( 'DB_USER', '$KORISNIK' );
 define( 'DB_PASSWORD', '$LOZINKA' );
@@ -125,12 +134,7 @@ ufw allow proto tcp from any to any port 80,443
 ufw --force enable
 
 
-# kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
-KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
-# generiraj lozinku duljine 16 znaova
-LOZINKA=$(openssl rand -base64 16) #za sudo
-KLJUC=/home/$KORISNIK/kljuc
-SSH_DIR=/home/$KORISNIK/.ssh
+
 # dodaj korisnika
 adduser --disabled-password --gecos "" $KORISNIK
 # postavi korisniku lozinku (treba mu za sudo)
