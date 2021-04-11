@@ -14,13 +14,13 @@ SSH_DIR=/home/$KORISNIK/.ssh
 
 apt update
 # instalacija webserver
-apt install -y apache2 
+apt install -y apache2 \
 # instalacija baza podataka
-apt install -y mariadb-server
+ mariadb-server \
 # instalacija programski jezik PHP
-apt install -y php php-fpm libapache2-mod-php php-mysql 
+ php php-fpm libapache2-mod-php php-mysql \
 # instalacija https verifikacije 
-apt install -y certbot python3-certbot-apache
+ certbot python3-certbot-apache
 
 # POST INSTALCIJA
 # omogući URL rewrite
