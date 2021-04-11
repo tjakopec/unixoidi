@@ -1,5 +1,8 @@
 #!/bin/bash
 
+####################################################################
+#                        OSNOVNE VARIJABLE                         #
+####################################################################
 # naziv domene
 DOMENA=unixoidi.xyz
 # email vlasnika
@@ -8,10 +11,22 @@ EMAIL=tjakopec@ffos.hr
 KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
 # generiraj lozinku duljine 16 znaova
 LOZINKA=$(openssl rand -base64 16) #za sudo
+# vrijednosti za generiranje porta
+MIN_PORT=1025
+MAX_PORT=9999
+# odaberi broj SSH porta između min i max
+PORT=$[ ( $RANDOM % ( $[ $MAX_PORT - $MIN_PORT ] + 1 ) ) + $MIN_PORT ]
+# putanja SSHD config
+SSH_CONFIG_DAT=/etc/ssh/sshd_config
 KLJUC=/home/$KORISNIK/kljuc
 SSH_DIR=/home/$KORISNIK/.ssh
+# generiraj SALT prema wordpres preporuci
+SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 
-
+####################################################################
+#                       OSNOVNA INSTALACIJA                        #
+####################################################################
+# ažuriraj popis repozitorija
 apt update
 # instalacija webserver
 apt install -y apache2 
@@ -26,7 +41,10 @@ apt install -y php-fpm
 # Mysql/MariaDB PHP driver
 apt install -y php-mysql
 
-# POST INSTALCIJA
+
+####################################################################
+#                         POST INSTALACIJA                         #
+####################################################################
 # omogući URL rewrite
 a2enmod rewrite
 # FAST CGI
@@ -35,10 +53,13 @@ a2enmod proxy_fcgi setenvif
 a2enconf php7.4-fpm
 # potvrdi onemogućavanje default konfiguracije
 service apache2 restart
-
 # počisti default index.html
 rm /var/www/html/index.html
 
+
+####################################################################
+#                              MARIADB                             #
+####################################################################
 # kreiraj bazu i korisnika
 cat <<EOT >> skripta.sql
 CREATE DATABASE $KORISNIK DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -52,6 +73,9 @@ mariadb < skripta.sql
 rm skripta.sql
 
 
+####################################################################
+#                            WORDPRESS                             #
+####################################################################
 # preuzmi wordpress
 wget https://wordpress.org/latest.tar.gz
 # raspakiraj wordpress
@@ -61,10 +85,6 @@ cd wordpress
 mv * /var/www/html
 # počisti za sobom
 cd ..; rmdir wordpress; rm latest.tar.gz
-
-
-# generiraj SALT prema wordpres preporuci
-SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 
 # kreiraj wp-config datoteku
 cat <<EOT >> /var/www/html/wp-config.php
@@ -84,12 +104,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once ABSPATH . 'wp-settings.php';
 EOT
 
-# postavi www-data kogirsnika i grupu da se može
+# postavi www-data korisnika i grupu da se može
 # putem web sučelja upravljati s wordpressom
 chown -R www-data:www-data /var/www/html
 find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
-
+# instaliraj wordpress
 curl "http://$DOMENA/wp-admin/install.php?step=2" \
   --data-urlencode "weblog_title=$DOMENA"\
   --data-urlencode "user_name=$KORISNIK" \
@@ -100,12 +120,10 @@ curl "http://$DOMENA/wp-admin/install.php?step=2" \
 
 
 
-SSH_CONFIG_DAT=/etc/ssh/sshd_config
-MIN_PORT=1025
-MAX_PORT=9999
-# odaberi broj SSH porta između min i max
-PORT=$[ ( $RANDOM % ( $[ $MAX_PORT - $MIN_PORT ] + 1 ) ) + $MIN_PORT ]
 
+####################################################################
+#                               SSHD                               #
+####################################################################
 # ako postoji ssh config datoteka obriši ju
 if test -f "$SSH_CONFIG_DAT"; then
     rm $SSH_CONFIG_DAT
@@ -126,6 +144,10 @@ EOT
 # ponovo pokreni sshd
 /etc/init.d/ssh restart
 
+
+####################################################################
+#                             FIREWALL                             #
+####################################################################
 # postavi firewall - non interaktive
 ufw disable
 # sve poništi
@@ -140,7 +162,9 @@ ufw allow proto tcp from any to any port 80,443
 ufw --force enable
 
 
-
+####################################################################
+#                             KORISNIK                             #
+####################################################################
 # dodaj korisnika
 adduser --disabled-password --gecos "" $KORISNIK
 # postavi korisniku lozinku (treba mu za sudo)
@@ -161,13 +185,23 @@ ssh-keygen -b 2048 -t rsa -f $KLJUC -q -N ""
 cat $KLJUC.pub >> $SSH_DIR/authorized_keys
 
 
-
+####################################################################
+#                             CERTBOT                              #
+####################################################################
 # potpiši https - kasnije uključi
-#certbot --non-interactive --agree-tos -m tjakopec@$EMAIL \
-#--apache --redirect -d $DOMENA -d www.$DOMENA
+certbot --non-interactive --agree-tos -m $EMAIL \
+--apache --redirect -d $DOMENA -d www.$DOMENA
 #There were too many requests of a given type :: Error creating new order :: too many certificates already issued for exact set of domains: unixoidi.xyz,www.unixoidi.xyz: see https://letsencrypt.org/docs/rate-limits/
 
+
+####################################################################
+#                  ISPIS PODATAKA KORISNIKU                        #
+####################################################################
 # ispiši podatke u konzolu za copy/paste
+echo "korisnik i ozinka isti za sve:"
+echo "1. linux user"
+echo "2. database user"
+echo "3. wordpress user"
 echo "korisnik: $KORISNIK"
 echo "lozinka: $LOZINKA"
 cat $KLJUC
