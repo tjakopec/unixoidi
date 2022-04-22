@@ -61,8 +61,8 @@ service apache2 restart
 rm /etc/apache2/sites-available/000-default.conf
 cat <<EOT > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:80>
-    ServerName DOMENA
-    ServerAlias www.DOMENA
+    ServerName $DOMENA
+    ServerAlias www.$DOMENA
     DocumentRoot "/var/www/html"
     ErrorLog "/var/www/$DOMENA-error_log"
     CustomLog "var/www/$DOMENA-access_log" common
