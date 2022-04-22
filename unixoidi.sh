@@ -4,7 +4,7 @@
 #                        OSNOVNE VARIJABLE                         #
 ####################################################################
 # naziv domene
-DOMENA=unixoidi.xyz
+DOMENA=unixoidi2022.xyz
 # email vlasnika
 EMAIL=tjakopec@ffos.hr
 # kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
