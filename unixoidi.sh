@@ -64,8 +64,6 @@ cat <<EOT > /etc/apache2/sites-available/000-default.conf
     ServerName $DOMENA
     ServerAlias www.$DOMENA
     DocumentRoot "/var/www/html"
-    ErrorLog "/var/www/$DOMENA-error_log"
-    CustomLog "var/www/$DOMENA-access_log" common
     ServerAdmin $EMAIL
         <Directory "/var/www/html">
 	  Options -Indexes +FollowSymLinks +MultiViews
@@ -75,7 +73,6 @@ cat <<EOT > /etc/apache2/sites-available/000-default.conf
 </VirtualHost>
 EOT
 
-service apache2 restart
 a2ensite 000-default.conf
 service apache2 restart
 
