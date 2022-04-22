@@ -56,6 +56,28 @@ service apache2 restart
 # počisti default index.html
 rm /var/www/html/index.html
 
+a2dissite 000-default.conf
+service apache2 restart
+rm /etc/apache2/sites-available/000-default.conf
+cat <<EOT > /etc/apache2/sites-available/000-default.conf
+<VirtualHost *:80>
+    ServerName DOMENA
+    ServerAlias www.DOMENA
+    DocumentRoot "/var/www/html"
+    ErrorLog "/var/www/$DOMENA-error_log"
+    CustomLog "var/www/$DOMENA-access_log" common
+    ServerAdmin $EMAIL
+        <Directory "/var/www/html">
+	  Options -Indexes +FollowSymLinks +MultiViews
+          AllowOverride All
+          Require all granted
+        </Directory>
+</VirtualHost>
+EOT
+
+service apache2 restart
+a2ensite 000-default.conf
+service apache2 restart
 
 ####################################################################
 #                              MARIADB                             #
