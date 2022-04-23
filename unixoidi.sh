@@ -55,6 +55,7 @@ a2enconf php7.4-fpm
 service apache2 restart
 # počisti default index.html
 rm /var/www/html/index.html
+
 # onemogući osnovni vhost
 a2dissite 000-default.conf
 # restart apache
