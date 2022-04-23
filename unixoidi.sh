@@ -55,10 +55,13 @@ a2enconf php7.4-fpm
 service apache2 restart
 # počisti default index.html
 rm /var/www/html/index.html
-
+# onemogući osnovni vhost
 a2dissite 000-default.conf
+# restart apache
 service apache2 restart
+# obriši vhost konfiguraciju
 rm /etc/apache2/sites-available/000-default.conf
+# kreiraj novu vhost konfiguraciju
 cat <<EOT > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:80>
     ServerName $DOMENA
@@ -72,8 +75,9 @@ cat <<EOT > /etc/apache2/sites-available/000-default.conf
         </Directory>
 </VirtualHost>
 EOT
-
+# omogući novi vhost
 a2ensite 000-default.conf
+# restart apache
 service apache2 restart
 
 ####################################################################
