@@ -4,7 +4,7 @@ Repozitorij za potrebe nastave na Preddiplomskom stručnom studiju Informacijske
 # izvesti
 ```
 su
-wget https://raw.githubusercontent.com/tjakopec/unixoidi/main/unixoidi.sh
+wget https://raw.githubusercontent.com/tjakopec/unixoidi/main/unixoidi_ubuntu_20_04.sh
 chmod u+x unixoidi.sh
-./unixoidi.sh
+./unixoidi_ubuntu_20_04.sh
 ```
