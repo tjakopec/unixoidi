@@ -50,7 +50,7 @@ a2enmod rewrite
 # FAST CGI
 a2enmod proxy_fcgi setenvif
 # omogući PHP FPM
-a2enconf php7.4-fpm
+a2enconf php8.1-fpm
 # potvrdi onemogućavanje default konfiguracije
 service apache2 restart
 # počisti default index.html
