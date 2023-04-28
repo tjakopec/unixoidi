@@ -4,9 +4,9 @@
 #                        OSNOVNE VARIJABLE                         #
 ####################################################################
 # naziv domene
-DOMENA=unixoidi2022.xyz
+DOMENA=unixoidi.xyz
 # email vlasnika
-EMAIL=tjakopec@ffos.hr
+EMAIL=tjakopec@gmail.com
 # kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
 KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
 # generiraj lozinku duljine 16 znaova
