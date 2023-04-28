@@ -5,6 +5,7 @@
 ####################################################################
 # naziv domene
 DOMENA=unixoidi.xyz
+IP_SERVERA=165.22.69.89
 # email vlasnika
 EMAIL=tjakopec@gmail.com
 # kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
@@ -26,7 +27,7 @@ SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 ####################################################################
 #                       OSNOVNA INSTALACIJA                        #
 ####################################################################
-sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+#sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # ažuriraj popis repozitorija
 apt update
 # instalacija webserver
@@ -234,5 +235,5 @@ cat $KLJUC
 rm $KLJUC.pub
 rm $KLJUC
 # ispiši pomoć pri spajanju s linux sustava
-echo ssh -i kljuc $KORISNIK@178.62.249.38 -p$PORT
+echo ssh -i kljuc $KORISNIK@$IP_SERVERA -p$PORT
 
