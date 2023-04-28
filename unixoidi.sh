@@ -26,6 +26,7 @@ SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 ####################################################################
 #                       OSNOVNA INSTALACIJA                        #
 ####################################################################
+sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # ažuriraj popis repozitorija
 apt update
 # instalacija webserver
