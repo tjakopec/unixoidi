@@ -5,6 +5,6 @@ Repozitorij za potrebe nastave na Preddiplomskom stručnom studiju Informacijske
 ```
 su
 wget https://raw.githubusercontent.com/tjakopec/unixoidi/main/unixoidi_ubuntu_20_10.sh
-chmod u+x unixoidi.sh
+chmod u+x unixoidi_ubuntu_20_10.sh
 ./unixoidi_ubuntu_20_10.sh
 ```
