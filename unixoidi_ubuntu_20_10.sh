@@ -5,6 +5,7 @@
 ####################################################################
 # naziv domene
 DOMENA=unixoidi.xyz
+# IP adresa
 IP_SERVERA=165.22.69.89
 # email vlasnika
 EMAIL=tjakopec@gmail.com
