@@ -6,7 +6,7 @@
 # naziv domene
 DOMENA=unixoidi.xyz
 # IP adresa
-IP_SERVERA=165.22.69.89
+IP_SERVERA=138.197.183.226
 # email vlasnika
 EMAIL=tjakopec@gmail.com
 # kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
