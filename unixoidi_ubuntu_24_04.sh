@@ -33,7 +33,7 @@ LOZINKA=$(openssl rand -base64 16) #za sudo
 MIN_PORT=1025
 MAX_PORT=9999
 # odaberi broj SSH porta između min i max
-PORT=$[ ( $RANDOM % ( $[ $MAX_PORT - $MIN_PORT ] + 1 ) ) + $MIN_PORT ]
+PORT=$(( $(shuf -i 1-10000 -n 1) % ( $MAX_PORT - $MIN_PORT + 1 ) + $MIN_PORT ))
 # putanja SSHD config
 SSH_CONFIG_DAT=/etc/ssh/sshd_config
 KLJUC=/home/$KORISNIK/kljuc
