@@ -16,7 +16,7 @@ fi
 DOMENA="$1"
 # IP adresa
 # Dohvaćanje IP adrese koristeći ip naredbu
-IP_SERVERA=$(ip addr show | grep "inet\b" | awk '{print $2}' | cut -d '/' -f 1)
+IP_SERVERA=$(ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d '/' -f 1)
 
 # Provjera je li IP adresa uspješno dohvaćena
 if [ -z "$IP" ]; then
