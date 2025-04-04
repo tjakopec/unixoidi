@@ -3,12 +3,26 @@
 ####################################################################
 #                        OSNOVNE VARIJABLE                         #
 ####################################################################
-# naziv domene
-DOMENA=unixoidi.pro
-# IP adresa
-IP_SERVERA=134.209.89.196
 # email vlasnika
 EMAIL=tjakopec@gmail.com
+# naziv domene
+# Provjera je li uneseno ime domene kao argument
+if [ -z "$1" ]; then
+  echo "Morate unijeti ime domene kao argument. (npr. unixoidi.pro)"
+  exit 1
+fi
+
+# Ime domene je dostupno u varijabli $1
+DOMENA="$1"
+# IP adresa
+# Dohvaćanje IP adrese koristeći ip naredbu
+IP_SERVERA=$(ip addr show | grep "inet\b" | awk '{print $2}' | cut -d '/' -f 1)
+
+# Provjera je li IP adresa uspješno dohvaćena
+if [ -z "$IP" ]; then
+  echo "Nije moguće dohvatiti IP adresu."
+  exit 1
+fi
 # kreiraj slučajni niz znakova duljine 8 samo mala slova a-z
 KORISNIK=$(tr -dc a-z </dev/urandom | head -c 8 ; echo '')
 # generiraj lozinku duljine 16 znaova
@@ -31,18 +45,8 @@ SALT_API=$(curl https://api.wordpress.org/secret-key/1.1/salt/)
 #sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # ažuriraj popis repozitorija
 apt update
-# instalacija webserver
-apt install -y apache2 
-# instalacija baza podataka
-apt install -y mariadb-server 
-# instalacija programski jezik PHP
-apt install -y php 
-# instalacija https verifikacije 
-apt install -y certbot python3-certbot-apache
-# FAST PHP MANAGER
-apt install -y php-fpm
-# Mysql/MariaDB PHP driver
-apt install -y php-mysql
+# instalacija webserver, baza podataka, programski jezik PHP, https verifikacije, FAST PHP MANAGER, Mysql/MariaDB PHP driver
+apt install -y apache2 mariadb-server php certbot python3-certbot-apache php-fpm php-mysql
 
 
 ####################################################################
