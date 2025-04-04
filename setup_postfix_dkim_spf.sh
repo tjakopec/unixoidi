@@ -13,7 +13,7 @@ set -e
 
 # Variables
 DOMAIN="unixoidi.pro"
-HOSTNAME="mail.$DOMAIN"
+HOSTNAME="mail.unixoidi.pro"
 ADMIN_EMAIL="admin@$DOMAIN"
 
 # Function to print status messages
@@ -76,11 +76,11 @@ smtp_tls_security_level=may
 smtp_tls_session_cache_database = btree:\${data_directory}/smtp_scache
 
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
-myhostname = $HOSTNAME
+myhostname = mail.unixoidi.pro
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 myorigin = /etc/mailname
-mydestination = $HOSTNAME, $DOMAIN, localhost.localdomain, localhost
+mydestination = mail.unixoidi.pro, unixoidi.pro, localhost.localdomain, localhost
 relayhost = 
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 mailbox_size_limit = 0
@@ -99,7 +99,7 @@ EOF
 print_status "Configuring OpenDKIM"
 
 # Create directory structure
-mkdir -p /etc/opendkim/keys/$DOMAIN
+mkdir -p /etc/opendkim/keys/unixoidi.pro
 
 # Configure OpenDKIM main configuration
 cat > /etc/opendkim.conf <<EOF
@@ -115,8 +115,8 @@ UMask                   002
 
 # Sign for example.com with key in /etc/dkimkeys/dkim.key using
 # selector '2007' (e.g. 2007._domainkey.example.com)
-Domain                  $DOMAIN
-KeyFile                 /etc/opendkim/keys/$DOMAIN/mail.private
+Domain                  unixoidi.pro
+KeyFile                 /etc/opendkim/keys/unixoidi.pro/mail.private
 Selector                mail
 
 # Commonly-used options; the commented-out versions show the defaults.
@@ -140,24 +140,24 @@ InternalHosts           refile:/etc/opendkim/trusted.hosts
 EOF
 
 # Create signing table
-echo "*@$DOMAIN mail._domainkey.$DOMAIN" > /etc/opendkim/signing.table
+echo "*@unixoidi.pro mail._domainkey.unixoidi.pro" > /etc/opendkim/signing.table
 
 # Create key table
-echo "mail._domainkey.$DOMAIN $DOMAIN:mail:/etc/opendkim/keys/$DOMAIN/mail.private" > /etc/opendkim/key.table
+echo "mail._domainkey.unixoidi.pro unixoidi.pro:mail:/etc/opendkim/keys/unixoidi.pro/mail.private" > /etc/opendkim/key.table
 
 # Create trusted hosts
 cat > /etc/opendkim/trusted.hosts <<EOF
 127.0.0.1
 localhost
 $HOSTNAME
-$DOMAIN
-*.$DOMAIN
+unixoidi.pro
+*.unixoidi.pro
 EOF
 
 # Generate DKIM keys
 print_status "Generating DKIM keys for $DOMAIN"
-cd /etc/opendkim/keys/$DOMAIN
-opendkim-genkey -b 2048 -d $DOMAIN -s mail
+cd /etc/opendkim/keys/unixoidi.pro
+opendkim-genkey -b 2048 -d unixoidi.pro -s mail
 chown opendkim:opendkim mail.private
 
 # Set permissions
@@ -181,7 +181,7 @@ systemctl restart postfix
 
 # Extract DKIM record
 print_status "Extracting DKIM record for DNS configuration"
-DKIM_RECORD=$(cat /etc/opendkim/keys/$DOMAIN/mail.txt | grep -o "v=DKIM1.*")
+DKIM_RECORD=$(cat /etc/opendkim/keys/unixoidi.pro/mail.txt | grep -o "v=DKIM1.*")
 
 # Generate SPF record
 SPF_RECORD="v=spf1 mx a ip4:$(curl -s ifconfig.me) ~all"
@@ -189,19 +189,19 @@ SPF_RECORD="v=spf1 mx a ip4:$(curl -s ifconfig.me) ~all"
 # Display DNS records to add
 print_status "DKIM and SPF setup complete!"
 echo ""
-echo "Please add the following DNS records to your domain $DOMAIN:"
+echo "Please add the following DNS records to your domain unixoidi.pro:"
 echo ""
 echo "DKIM Record:"
-echo "mail._domainkey.$DOMAIN. IN TXT \"$DKIM_RECORD\""
+echo "mail._domainkey.unixoidi.pro. IN TXT \"$DKIM_RECORD\""
 echo ""
 echo "SPF Record:"
-echo "$DOMAIN. IN TXT \"$SPF_RECORD\""
+echo "unixoidi.pro. IN TXT \"$SPF_RECORD\""
 echo ""
 echo "MX Record (if not already set):"
-echo "$DOMAIN. IN MX 10 $HOSTNAME."
+echo "unixoidi.pro. IN MX 10 mail.unixoidi.pro."
 echo ""
 echo "A Record (if not already set):"
 echo "$HOSTNAME. IN A $(curl -s ifconfig.me)"
 echo ""
 print_status "Postfix installation and configuration completed successfully!"
-print_status "Mail server is set up for domain: $DOMAIN"
+print_status "Mail server is set up for domain: unixoidi.pro"
