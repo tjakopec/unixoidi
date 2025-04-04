@@ -16,10 +16,12 @@ fi
 DOMENA="$1"
 # IP adresa
 # Dohvaćanje IP adrese koristeći ip naredbu
-IP_SERVERA=$(ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d '/' -f 1)
+IP_ADRESE=$(ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d '/' -f 1)
+# Uzmi prvu IP adresu
+IP_SERVERA=$(echo "$IP_ADRESE" | awk 'NR==1{print $1}')
 
 # Provjera je li IP adresa uspješno dohvaćena
-if [ -z "$IP" ]; then
+if [ -z "$IP_SERVERA" ]; then
   echo "Nije moguće dohvatiti IP adresu."
   exit 1
 fi
